@@ -2,12 +2,13 @@
 
 .idea
 
-department_service/target
+department-service/target
+department-service/src/test/*
 
-department_service/src/test/*
+employee-service/target
+employee-service/src/test/*
 
-employee_service/target
-
-employee_service/src/test/*
+service-registry/target
+service-registry/src/test/*
 
 docker*yml
