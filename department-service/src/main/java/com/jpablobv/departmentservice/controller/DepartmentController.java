@@ -42,7 +42,7 @@ public class DepartmentController {
     }
 
     // Build get Department By ID REST API
-    @GetMapping("{id}")
+    @GetMapping("id/{id}")
     public ResponseEntity<?> getDepartmentById(@PathVariable("id") Long departmentId){
         DepartmentDto departmentDto = departmentService.getDepartmentById(departmentId);
         return ResponseEntity.ok(departmentDto);

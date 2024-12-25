@@ -1,5 +1,6 @@
 package com.jpablobv.employeeservice.controller;
 
+import com.jpablobv.employeeservice.dto.APIResponseDto;
 import com.jpablobv.employeeservice.dto.EmployeeDto;
 import com.jpablobv.employeeservice.exception.ErrorDetails;
 import com.jpablobv.employeeservice.exception.ResourceNotFoundException;
@@ -30,8 +31,8 @@ public class EmployeeController {
     // Build get Employee REST API
     @GetMapping("{id}")
     public ResponseEntity<?> getEmployeeById(@PathVariable("id") Long employeeId) {
-        EmployeeDto employeeDto = employeeService.getEmployeeById(employeeId);
-        return new ResponseEntity<>(employeeDto, HttpStatus.OK);
+        APIResponseDto apiResponseDto = employeeService.getEmployeeById(employeeId);
+        return new ResponseEntity<>(apiResponseDto, HttpStatus.OK);
     }
 
     // Build get all Employees REST API

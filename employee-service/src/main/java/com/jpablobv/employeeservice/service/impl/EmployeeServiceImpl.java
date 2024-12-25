@@ -1,14 +1,20 @@
 package com.jpablobv.employeeservice.service.impl;
 
+import com.jpablobv.employeeservice.dto.APIResponseDto;
+import com.jpablobv.employeeservice.dto.DepartmentDto;
 import com.jpablobv.employeeservice.dto.EmployeeDto;
 import com.jpablobv.employeeservice.entity.Employee;
 import com.jpablobv.employeeservice.exception.ResourceNotFoundException;
 import com.jpablobv.employeeservice.mapper.IAutoEmployeeMapper;
 import com.jpablobv.employeeservice.repository.IEmployeeRepository;
+import com.jpablobv.employeeservice.service.IAPIClient;
 import com.jpablobv.employeeservice.service.IEmployeeService;
 import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.web.reactive.function.client.WebClient;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -18,6 +24,10 @@ import java.util.stream.Collectors;
 public class EmployeeServiceImpl implements IEmployeeService {
 
     private IEmployeeRepository employeeRepository;
+
+    // private RestTemplate restTemplate;
+    // private WebClient webClient;
+    private IAPIClient apiClient;
 
     private ModelMapper modelMapper;
 
@@ -48,14 +58,32 @@ public class EmployeeServiceImpl implements IEmployeeService {
     }
 
     @Override
-    public EmployeeDto getEmployeeById(Long employeeId) {
+    public APIResponseDto getEmployeeById(Long employeeId) {
         Employee employee = employeeRepository.findById(employeeId).orElseThrow(
                 () -> new ResourceNotFoundException("Employee", "id", employeeId)
         );
+/*        ResponseEntity<DepartmentDto> responseEntity = restTemplate.getForEntity(
+                "http://localhost:8080/api/departments/code/" + employee.getDepartmentCode(),
+                DepartmentDto.class);
+        DepartmentDto departmentDto = responseEntity.getBody();
+*/
+/*        DepartmentDto departmentDto = webClient.get()
+                .uri("http://localhost:8080/api/departments/code/" + employee.getDepartmentCode())
+                .retrieve()
+                .bodyToMono(DepartmentDto.class)
+                .block();*/
+
+        DepartmentDto departmentDto = apiClient.getDepartmentByCode(employee.getDepartmentCode());
+
+        EmployeeDto employeeDto = IAutoEmployeeMapper.MAPPER.mapToEmployeeDto(employee);
+
+        APIResponseDto apiResponseDto = new APIResponseDto();
+        apiResponseDto.setEmployee(employeeDto);
+        apiResponseDto.setDepartment(departmentDto);
 
         // return EmployeeMapper.mapToEmployeeDto(employee);
         // return modelMapper.map(employee, EmployeeDto.class);
-        return IAutoEmployeeMapper.MAPPER.mapToEmployeeDto(employee);
+        return apiResponseDto;
     }
 
     @Override
