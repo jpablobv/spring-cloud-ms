@@ -4,6 +4,10 @@
 
 department_service/target
 
+department_service/src/test/*
+
 employee_service/target
+
+employee_service/src/test/*
 
 docker*yml

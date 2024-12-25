@@ -2,6 +2,7 @@ package com.jpablobv.departmentservice.service.impl;
 
 import com.jpablobv.departmentservice.dto.DepartmentDto;
 import com.jpablobv.departmentservice.entity.Department;
+import com.jpablobv.departmentservice.exception.ResourceNotFoundException;
 import com.jpablobv.departmentservice.mapper.IAutoDepartmentMapper;
 import com.jpablobv.departmentservice.repository.IDepartmentRepository;
 import com.jpablobv.departmentservice.service.IDepartmentService;
@@ -37,7 +38,7 @@ public class DepartmentServiceImpl implements IDepartmentService {
     public DepartmentDto getDeparmentByCode(String departmentCode) {
         Department department = departmentRepository.findByDepartmentCode(departmentCode);
         if (department == null) {
-            throw new RuntimeException("Department not found");
+            throw new ResourceNotFoundException("Department", "code", departmentCode);
         }
         // return DepartmentMapper.mapToDepartmentDto(department);
         // return modelMapper.map(department, DepartmentDto.class);
@@ -47,7 +48,7 @@ public class DepartmentServiceImpl implements IDepartmentService {
     @Override
     public DepartmentDto getDepartmentById(Long departmentId) {
         Department department = departmentRepository.findById(departmentId).orElseThrow(
-                () -> new RuntimeException("Department with id '" + departmentId + "' not found")
+            () -> new ResourceNotFoundException("Department", "id", departmentId.toString())
         );
         // return modelMapper.map(department, DepartmentDto.class);
         return IAutoDepartmentMapper.MAPPER.mapToDepartmentDto(department);
@@ -58,7 +59,6 @@ public class DepartmentServiceImpl implements IDepartmentService {
         List<Department> departments = departmentRepository.findAll();
 /*
         .map(DepartmentMapper::mapToDepartmentDto) // .map((department) -> DepartmentMapper.mapToDepartmentDto(department))
-
         .map(department -> modelMapper.map(department, DepartmentDto.class))
 */
         return departments.stream()
@@ -69,7 +69,7 @@ public class DepartmentServiceImpl implements IDepartmentService {
     @Override
     public DepartmentDto updateDepartment(Long departmentId, DepartmentDto departmentDto) {
         Department department = departmentRepository.findById(departmentId).orElseThrow(
-                () -> new RuntimeException("Department with id '" + departmentId + "' not found")
+                () -> new ResourceNotFoundException("Department", "id", departmentId.toString())
         );
 
         department.setDepartmentName(departmentDto.getDepartmentName());
@@ -80,6 +80,14 @@ public class DepartmentServiceImpl implements IDepartmentService {
 
         // return modelMapper.map(updateDepartment, DepartmentDto.class);
         return IAutoDepartmentMapper.MAPPER.mapToDepartmentDto(updateDepartment);
+    }
+
+    @Override
+    public void deleteDepartment(Long departmentId) {
+        Department department = departmentRepository.findById(departmentId).orElseThrow(
+                () -> new ResourceNotFoundException("Department", "id", departmentId.toString())
+        );
+        departmentRepository.delete(department);
     }
 
 }

@@ -2,6 +2,7 @@ package com.jpablobv.employeeservice.service.impl;
 
 import com.jpablobv.employeeservice.dto.EmployeeDto;
 import com.jpablobv.employeeservice.entity.Employee;
+import com.jpablobv.employeeservice.exception.ResourceNotFoundException;
 import com.jpablobv.employeeservice.mapper.IAutoEmployeeMapper;
 import com.jpablobv.employeeservice.repository.IEmployeeRepository;
 import com.jpablobv.employeeservice.service.IEmployeeService;
@@ -49,7 +50,7 @@ public class EmployeeServiceImpl implements IEmployeeService {
     @Override
     public EmployeeDto getEmployeeById(Long employeeId) {
         Employee employee = employeeRepository.findById(employeeId).orElseThrow(
-                () -> new RuntimeException("Employee with id '" + employeeId + "' not found")
+                () -> new ResourceNotFoundException("Employee", "id", employeeId)
         );
 
         // return EmployeeMapper.mapToEmployeeDto(employee);
@@ -60,7 +61,7 @@ public class EmployeeServiceImpl implements IEmployeeService {
     @Override
     public EmployeeDto updateEmployee(Long employeeId, EmployeeDto employeeDto) {
         Employee employee = employeeRepository.findById(employeeId).orElseThrow(
-                () -> new RuntimeException("Employee with id '" + employeeId + "' not found")
+                () -> new ResourceNotFoundException("Employee", "id", employeeId)
         );
         employee.setFirstName(employeeDto.getFirstName());
         employee.setLastName(employeeDto.getLastName());
@@ -75,7 +76,7 @@ public class EmployeeServiceImpl implements IEmployeeService {
     @Override
     public void deleteEmployee(Long employeeId) {
         Employee employee = employeeRepository.findById(employeeId).orElseThrow(
-                () -> new RuntimeException("Employee with id '" + employeeId + "' not found")
+                () -> new ResourceNotFoundException("Employee", "id", employeeId)
         );
         employeeRepository.delete(employee);
     }

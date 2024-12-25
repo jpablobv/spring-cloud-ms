@@ -1,12 +1,16 @@
 package com.jpablobv.employeeservice.controller;
 
 import com.jpablobv.employeeservice.dto.EmployeeDto;
+import com.jpablobv.employeeservice.exception.ErrorDetails;
+import com.jpablobv.employeeservice.exception.ResourceNotFoundException;
 import com.jpablobv.employeeservice.service.IEmployeeService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.context.request.WebRequest;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -50,5 +54,19 @@ public class EmployeeController {
         employeeService.deleteEmployee(employeeId);
         return ResponseEntity.ok("Employee deleted");
     }
+
+/*    @ExceptionHandler(ResourceNotFoundException.class)
+    public ResponseEntity<?> handleResourceNotFoundException(
+            ResourceNotFoundException exception,
+            WebRequest webRequest
+    ) {
+        ErrorDetails errorDetails = new ErrorDetails(
+                LocalDateTime.now(),
+                exception.getMessage(),
+                webRequest.getDescription(false),
+                "EMPLOYEE_NOT_FOUND"
+        );
+        return new ResponseEntity<>(errorDetails, HttpStatus.NOT_FOUND);
+    }*/
 
 }
