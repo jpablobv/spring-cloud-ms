@@ -11,4 +11,7 @@ employee-service/src/test/*
 service-registry/target
 service-registry/src/test/*
 
+api-gateway/target
+api-gateway/src/test/*
+
 docker*yml
