@@ -1,0 +1,4 @@
+Ejecutar el contenedor Docker para Zipkin
+
+docker pull openzipkin/zipkin:3
+docker run --rm -it --name zipkin -p 9411:9411 openzipkin/zipkin:3

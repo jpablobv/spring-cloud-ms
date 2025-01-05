@@ -9,12 +9,14 @@ import com.jpablobv.employeeservice.mapper.IAutoEmployeeMapper;
 import com.jpablobv.employeeservice.repository.IEmployeeRepository;
 import com.jpablobv.employeeservice.service.IAPIClient;
 import com.jpablobv.employeeservice.service.IEmployeeService;
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+import io.github.resilience4j.retry.annotation.Retry;
 import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
-import org.springframework.http.ResponseEntity;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
-import org.springframework.web.reactive.function.client.WebClient;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -22,6 +24,8 @@ import java.util.stream.Collectors;
 @Service
 @AllArgsConstructor
 public class EmployeeServiceImpl implements IEmployeeService {
+
+    private static Logger LOGGER = LoggerFactory.getLogger(EmployeeServiceImpl.class);
 
     private IEmployeeRepository employeeRepository;
 
@@ -57,8 +61,13 @@ public class EmployeeServiceImpl implements IEmployeeService {
                 .collect( Collectors.toList() );
     }
 
+    // @CircuitBreaker(name = "${spring.application.name}", fallbackMethod = "getDefaultDepartment")
+    @Retry(name = "${spring.application.name}", fallbackMethod = "getDefaultDepartment")
     @Override
     public APIResponseDto getEmployeeById(Long employeeId) {
+
+        LOGGER.info("inside getEmployeeById() method");
+
         Employee employee = employeeRepository.findById(employeeId).orElseThrow(
                 () -> new ResourceNotFoundException("Employee", "id", employeeId)
         );
@@ -107,6 +116,29 @@ public class EmployeeServiceImpl implements IEmployeeService {
                 () -> new ResourceNotFoundException("Employee", "id", employeeId)
         );
         employeeRepository.delete(employee);
+    }
+
+    // Fallback Method for getEmployeeById()
+    public APIResponseDto getDefaultDepartment(Long employeeId, Exception exception) {
+
+        LOGGER.info("inside getDefaultDepartment() method");
+
+        Employee employee = employeeRepository.findById(employeeId).orElseThrow(
+                () -> new ResourceNotFoundException("Employee", "id", employeeId)
+        );
+
+        DepartmentDto departmentDto = new DepartmentDto();
+        departmentDto.setDepartmentName("R&D Department");
+        departmentDto.setDepartmentCode("RD001");
+        departmentDto.setDepartmentDescription("Research and Development Department");
+
+        EmployeeDto employeeDto = IAutoEmployeeMapper.MAPPER.mapToEmployeeDto(employee);
+
+        APIResponseDto apiResponseDto = new APIResponseDto();
+        apiResponseDto.setEmployee(employeeDto);
+        apiResponseDto.setDepartment(departmentDto);
+
+        return apiResponseDto;
     }
 
 }
