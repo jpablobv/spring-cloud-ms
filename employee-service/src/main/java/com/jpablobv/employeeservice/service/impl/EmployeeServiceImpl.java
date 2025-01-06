@@ -3,13 +3,14 @@ package com.jpablobv.employeeservice.service.impl;
 import com.jpablobv.employeeservice.dto.APIResponseDto;
 import com.jpablobv.employeeservice.dto.DepartmentDto;
 import com.jpablobv.employeeservice.dto.EmployeeDto;
+import com.jpablobv.employeeservice.dto.OrganizationDto;
 import com.jpablobv.employeeservice.entity.Employee;
 import com.jpablobv.employeeservice.exception.ResourceNotFoundException;
 import com.jpablobv.employeeservice.mapper.IAutoEmployeeMapper;
 import com.jpablobv.employeeservice.repository.IEmployeeRepository;
 import com.jpablobv.employeeservice.service.IAPIClient;
+import com.jpablobv.employeeservice.service.IAPIClientOrganization;
 import com.jpablobv.employeeservice.service.IEmployeeService;
-import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import io.github.resilience4j.retry.annotation.Retry;
 import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -32,6 +33,7 @@ public class EmployeeServiceImpl implements IEmployeeService {
     // private RestTemplate restTemplate;
     // private WebClient webClient;
     private IAPIClient apiClient;
+    private IAPIClientOrganization apiClientOrganization;
 
     private ModelMapper modelMapper;
 
@@ -84,11 +86,14 @@ public class EmployeeServiceImpl implements IEmployeeService {
 
         DepartmentDto departmentDto = apiClient.getDepartmentByCode(employee.getDepartmentCode());
 
+        OrganizationDto organizationDto = apiClientOrganization.getOrganizationByCode(employee.getOrganizationCode());
+
         EmployeeDto employeeDto = IAutoEmployeeMapper.MAPPER.mapToEmployeeDto(employee);
 
         APIResponseDto apiResponseDto = new APIResponseDto();
         apiResponseDto.setEmployee(employeeDto);
         apiResponseDto.setDepartment(departmentDto);
+        apiResponseDto.setOrganization(organizationDto);
 
         // return EmployeeMapper.mapToEmployeeDto(employee);
         // return modelMapper.map(employee, EmployeeDto.class);
